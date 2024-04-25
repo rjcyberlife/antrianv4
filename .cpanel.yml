@@ -1,0 +1,5 @@
+---
+deployment:
+tasks:
+- export DEPLOYPATH=/home/kanq8952/public_html/antrian.kanimpekanbaru.id
+- /bin/cp -r * $DEPLOYPATH
