@@ -6,7 +6,7 @@ $panggil = new panggilan();
 
 if(!$panggil->getClientMAC())
 {
- header('Location: index.php');
+ //header('Location: index.php');
  exit;
 }
 
@@ -31,7 +31,7 @@ if(!$panggil->getClientMAC())
  <link rel="stylesheet" href="assets/css/font-awesome.min.css">
  <script src="assets/js/core/jquery.min.js"></script>
  <script src="assets/js/core/bootstrap-material-design.min.js"></script>
-
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
  <script src="assets/js/fungsi.js"></script>
  <!-- CSS Files -->
  <link href="assets/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
@@ -71,6 +71,7 @@ if(!$panggil->getClientMAC())
     )
   })
   
+ 
 </script>
 
 </head>
@@ -125,8 +126,8 @@ if(!$panggil->getClientMAC())
               <div class="card card-chart">
                 <div class="card-header card-header-danger">
                   
-                    <h4><strong>ONLINE</strong></h4>                               
-                    ANTRIAN YANG DILAYANI SAAT INI : <br/> <h2><strong><div id="nopanggilanA" ><?= $panggil->getCurrentAntrian("A") ?></div> </strong></h2>
+                    <h5><strong>ONLINE</strong></h5>                               
+                    ANTRIAN YANG DILAYANI SAAT INI : <br/> <h4><strong><div id="nopanggilanA" ><?= $panggil->getCurrentAntrian("A") ?></div> </strong></h4>
                 </div>
                 <div class="card-body">
                  
@@ -147,8 +148,8 @@ if(!$panggil->getClientMAC())
               <div class="card card-chart">
                 <div class="card-header card-header-success">
                                   
-                    <h4><strong>LANSIA</strong></h4>                 
-                    ANTRIAN YANG DILAYANI SAAT INI : <br/> <h2><strong><div id="nopanggilanB" ><?= $panggil->getCurrentAntrian("B") ?></div> </strong></h2>
+                    <h5><strong>LANSIA</strong></h5>                 
+                    ANTRIAN YANG DILAYANI SAAT INI : <br/> <h4><strong><div id="nopanggilanB" ><?= $panggil->getCurrentAntrian("B") ?></div> </strong></h4>
                
                 </div>
                 <div class="card-body">
@@ -174,8 +175,8 @@ if(!$panggil->getClientMAC())
               <div class="card card-chart">
                 <div class="card-header card-header-warning">
                 
-                    <h4><strong>BAP</strong></h4>                 
-                    ANTRIAN YANG DILAYANI SAAT INI : <br/> <h2><strong><div id="nopanggilanC" ><?= $panggil->getCurrentAntrian("C") ?></div> </strong></h2>
+                    <h5><strong>BAP</strong></h5>                 
+                    ANTRIAN YANG DILAYANI SAAT INI : <br/> <h4><strong><div id="nopanggilanC" ><?= $panggil->getCurrentAntrian("C") ?></div> </strong></h4>
                
 
 
@@ -199,8 +200,8 @@ if(!$panggil->getClientMAC())
               <div class="card card-chart">
                 <div class="card-header card-header-info">
                 
-                    <h4><strong>PERCEPATAN</strong></h4>                 
-                    ANTRIAN YANG DILAYANI SAAT INI : <br/> <h2><strong><div id="nopanggilanF" ><?= $panggil->getCurrentAntrian("F") ?></div> </strong></h2>
+                    <h5><strong>PERCEPATAN</strong></h5>                 
+                    ANTRIAN YANG DILAYANI SAAT INI : <br/> <h4><strong><div id="nopanggilanF" ><?= $panggil->getCurrentAntrian("F") ?></div> </strong></h4>
                
 
 
@@ -225,26 +226,42 @@ if(!$panggil->getClientMAC())
 
            <div class="row">
 
-           <div class="col-md-4"></div>
+           <div class="col-md-2"></div>
 
 
-
-            <div class="col-md-4 ">
-              <div class="card card-chart ">
-               
-                <div class="card-body text-center">
-                  <h2 class="text-success"><b>LOKET <?= $panggil->getloket() ?></b></h2>
-                  <div id="txt"></div>
+              <div class="col-md-4 ">
+                  <div class="card card-chart ">
                   
-                </div>
-              
+                      <div class="card-body text-center">
+                        <br>
+                        <br>
+                       
+                        <h1 class="text-success"><b>LOKET <?= $panggil->getloket() ?></b></h1>
+                        <div id="txt"></div>
+                      
+                        <br>
+                      </div>
+                  
+                  </div>
               </div>
-            </div>
 
-            <div class="col-md-4"></div>
+              <div class="col-md-4">
+                  <div class="card card-chart ">
+                  
+                      <div class="card-body text-center">
+                       
+                           <canvas id="myChart" style="width:100%;max-width:500px"></canvas>
+
+                      </div>
+                  
+                  </div>
+              </div>
+         
+   
+
+              <div class="col-md-2"></div>
 
           </div>
-
 
         </div>
       </div>
@@ -276,7 +293,62 @@ if(!$panggil->getClientMAC())
   </div>
 </div>
 
+
+<script>
   
+  let xValues = [];
+  let yValues = [];
+  let chart = new Chart("myChart", {
+                  type: "bar",
+                  data: {
+                    labels: xValues,
+                    datasets: [{
+                      backgroundColor: "#4C0099",
+                      data: yValues
+                    }]
+                  },
+                  options: {
+                    legend: {display: false},
+                    title: {
+                      display: true,
+                      text: "Grafik Pengawasan Antrian Paspor"
+                    },
+                    
+                  }
+                });
+ 
+  setInterval(function(){
+    $.ajax({
+              type: "GET",
+              url: "lib/grafikpanggilan.php",
+              //data: {_tanggal : tanggal, _prefix : prefix, _no:no },
+              contentType : 'application/json',
+             
+              success: function(dt){
+                var res = JSON.parse(dt);
+                
+                xValues.length=0;
+                
+                yValues.length=0;
+                //res.forEach(function(item){
+                  for(key in res) {
+               // console.log(res[key].loket);
+                xValues[key]="Loket " + res[key].loket; 
+                yValues[key]=res[key].jumlah;      
+                }
+                
+                chart.update();
+              },
+              error: function(errMsg) {
+                  //your error function
+              }
+          });
+        
+        },5000);
+
+
+</script>
+
 </body>
 
 </html>

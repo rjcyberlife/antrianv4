@@ -99,6 +99,16 @@ class panggilan extends database
 
     }
 
+    public function grafikpanggilan()
+    {
+        $query = $this->conn->query("SELECT loket,COUNT(nomor_urut) as jumlah FROM panggil where DATE(tanggaljam)=CURDATE() GROUP BY loket ORDER BY loket ");
+        $row = $query->fetch_all(MYSQLI_ASSOC);
+        $json = json_encode($row);
+        return $json;
+        
+    }
+
+
     public function getLastPanggil()
     {
         $query = $this->conn->query("SELECT*FROM panggil ORDER BY id DESC limit 1");
